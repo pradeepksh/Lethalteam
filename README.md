@@ -1,2 +1,0 @@
-# Lethalteam
-Created with CodeSandbox
