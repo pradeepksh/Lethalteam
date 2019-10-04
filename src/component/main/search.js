@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
-
+import axios from "axios";
+import $ from "jquery";
 class Search extends React.Component {
   constructor() {
     super();
@@ -16,20 +17,42 @@ class Search extends React.Component {
   };
   Predict = e => {
     e.preventDefault();
+    // fetch(`http://localhost:5000/a`, {
+    //   method: "POST",
+    //   credentials: "include",
+    //   body: JSON.stringify("hello"),
+    //   mode: "no-cors",
+    //   cache: "no-cache",
 
-    fetch("https://efd5f.csb.app/pradeep7.pythonanywhere.com")
-      .then(f => {
-        return f.json();
-      })
-      .then(data => console.log(data));
+    //   headers: {
+    //    "content-type": "*"
+    //   }
+    // }
+    // ).then(function(response) {
+    //   response.json().then(
+    //     data=>console.log(data)
+    //   )
+    // });
+
+    $.ajax({
+      type: "GET",
+      url: "http://localhost:5000/a",
+      data: { arg1: ["hello", "asdhas", "pasdiias"].toString() },
+      contentType: "application/json;charset=UTF-8",
+      success: function(result) {
+        console.log(result);
+      }
+    });
   };
   pres = e => {
     if (e.key === "Enter") {
-      this.props.dispatch({ type: "Add", payload: this.state.symptoms });
-      this.setState({
-        word: ""
-      });
-      document.getElementById("search").value = "";
+      if (this.state.symptoms !== "") {
+        this.props.dispatch({ type: "Add", payload: this.state.symptoms });
+        this.setState({
+          symptoms: ""
+        });
+        document.getElementById("search").value = "";
+      }
     }
   };
   render() {
