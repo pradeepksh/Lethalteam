@@ -13,14 +13,12 @@ const init_state = {
 const reducer = (state = init_state, action) => {
   switch (action.type) {
     case "Add":
-      return { symptoms: [...state.symptoms, action.payload] };
-      break;
+      return { symptoms: [...state.symptoms, action.payload], disease: "" };
     case "remove":
       const index = state.symptoms.indexOf(action.payload);
       state.symptoms.splice(index, 1);
-      return { symptoms: [...state.symptoms] };
+      return { symptoms: [...state.symptoms], disease: "" };
     case "add_disease":
-      console.log(state.disease);
       return { symptoms: [...state.symptoms], disease: action.payload };
 
     default:
