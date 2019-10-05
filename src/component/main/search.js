@@ -3,13 +3,12 @@ import { connect } from "react-redux";
 import axios from "axios";
 import $ from "jquery";
 class Search extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       symptoms: ""
     };
   }
-
   handlechange = e => {
     this.setState({
       symptoms: e.target.value
@@ -17,32 +16,19 @@ class Search extends React.Component {
   };
   Predict = e => {
     e.preventDefault();
-    // fetch(`http://localhost:5000/a`, {
-    //   method: "POST",
-    //   credentials: "include",
-    //   body: JSON.stringify("hello"),
-    //   mode: "no-cors",
-    //   cache: "no-cache",
-
-    //   headers: {
-    //    "content-type": "*"
-    //   }
-    // }
-    // ).then(function(response) {
-    //   response.json().then(
-    //     data=>console.log(data)
-    //   )
-    // });
-
-    $.ajax({
-      type: "GET",
-      url: "http://localhost:5000/a",
-      data: { arg1: ["hello", "asdhas", "pasdiias"].toString() },
-      contentType: "application/json;charset=UTF-8",
-      success: function(result) {
-        console.log(result);
-      }
-    });
+    if (this.props.symptoms.length > 0) {
+      const { dispatch } = this.props;
+      const s = this.props.symptoms;
+      $.ajax({
+        type: "GET",
+        url: "https://whispering-fortress-45201.herokuapp.com/api",
+        data: { symptoms: s.toString() },
+        contentType: "application/json;charset=UTF-8",
+        success: function(result) {
+          dispatch({ type: "add_disease", payload: result });
+        }
+      });
+    }
   };
   pres = e => {
     if (e.key === "Enter") {
@@ -77,7 +63,7 @@ class Search extends React.Component {
 }
 
 const mapstatestoprops = state => {
-  return { symptoms: state.symptoms };
+  return { symptoms: state.symptoms, disease: state.disease };
 };
 
 export default connect(mapstatestoprops)(Search);

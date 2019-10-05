@@ -7,7 +7,8 @@ import Main from "./component/main";
 import "./styles.css";
 
 const init_state = {
-  symptoms: []
+  symptoms: [],
+  disease: ""
 };
 const reducer = (state = init_state, action) => {
   switch (action.type) {
@@ -18,6 +19,10 @@ const reducer = (state = init_state, action) => {
       const index = state.symptoms.indexOf(action.payload);
       state.symptoms.splice(index, 1);
       return { symptoms: [...state.symptoms] };
+    case "add_disease":
+      console.log(state.disease);
+      return { symptoms: [...state.symptoms], disease: action.payload };
+
     default:
       return state;
   }
