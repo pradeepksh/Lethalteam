@@ -8,18 +8,21 @@ import "./styles.css";
 
 const init_state = {
   symptoms: [],
-  disease: ""
+  disease: null
 };
 const reducer = (state = init_state, action) => {
   switch (action.type) {
     case "Add":
-      return { symptoms: [...state.symptoms, action.payload], disease: "" };
+      return { symptoms: [...state.symptoms, action.payload], disease: null };
     case "remove":
       const index = state.symptoms.indexOf(action.payload);
       state.symptoms.splice(index, 1);
-      return { symptoms: [...state.symptoms], disease: "" };
+      return { symptoms: [...state.symptoms], disease: null };
     case "add_disease":
-      return { symptoms: [...state.symptoms], disease: action.payload };
+      return {
+        symptoms: [...state.symptoms],
+        disease: action.payload
+      };
 
     default:
       return state;

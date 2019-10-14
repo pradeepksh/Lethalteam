@@ -20,11 +20,13 @@ class Search extends React.Component {
       const s = this.props.symptoms;
       $.ajax({
         type: "GET",
-        url: "https://whispering-fortress-45201.herokuapp.com/api",
-        data: { symptoms: s.toString() },
+        //url: "https://whispering-fortress-45201.herokuapp.com/api",
+        url: "http://localhost:5000/api",
+        data: { exp: s.toString() },
         contentType: "application/json;charset=UTF-8",
         success: function(result) {
           dispatch({ type: "add_disease", payload: result });
+          //console.log(result)
         }
       });
     }
@@ -3726,8 +3728,8 @@ class Search extends React.Component {
           list="sym"
         />
         <datalist id="sym">
-          {symptoms.map(d => {
-            return <option value={d} />;
+          {symptoms.map((d, key) => {
+            return <option id={key} value={d} />;
           })}
         </datalist>
         <button className="predict" onClick={this.Predict}>

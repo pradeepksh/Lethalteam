@@ -44,11 +44,12 @@
 
 .App .main {
   width: 100%;
-  height: calc(100% - 60px);
   display: flex;
+  flex: 1;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  padding: 20px 0px;
 }
 
 .main .search {
@@ -119,19 +120,30 @@
 .main .diseases {
   width: 100%;
   display: flex;
-  justify-content: center;
+
+  flex-wrap: wrap;
 }
 
 .diseases .disease-main {
   padding: 10px;
-  box-shadow: 0px 0px 20px var(--shadow--);
+  box-shadow: 0px 0px 30px 0px rgba(166, 166, 166, 1);
   border-radius: 10px;
+  margin: 15px;
+  transition: all 0.2s ease-in;
+  cursor: auto;
+  min-width: 150px;
+  padding: 20px;
+}
+.diseases .disease-main:hover {
+  box-shadow: 0px 0px 50px 0px rgba(166, 166, 166, 1);
+  transform: scale(1.05);
 }
 
 .diseases .disease-main .disease-top {
   width: 100%;
   display: flex;
   align-items: center;
+  justify-content: space-between;
 }
 .disease-top i {
   display: flex;

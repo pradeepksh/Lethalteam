@@ -7,15 +7,17 @@ class Diseases extends React.Component {
   render() {
     return (
       <div className="diseases">
-        {this.props.disease !== "" ? (
-          <div className="disease-main">
-            <div className="disease-top">
-              <div className="disease-name">{this.props.disease}</div>
-              <i className="material-icons">info</i>
-            </div>
-            <div className="disease-bottom" />
-          </div>
-        ) : null}
+        {this.props.disease !== null
+          ? this.props.disease.map((d, key) => (
+              <div className="disease-main" id={key}>
+                <div className="disease-top">
+                  <div className="disease-name">{d}</div>
+                  <i className="material-icons">info</i>
+                </div>
+                <div className="disease-bottom" />
+              </div>
+            ))
+          : null}
       </div>
     );
   }
