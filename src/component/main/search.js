@@ -20,8 +20,8 @@ class Search extends React.Component {
       const s = this.props.symptoms;
       $.ajax({
         type: "GET",
-        //url: "https://whispering-fortress-45201.herokuapp.com/api",
-        url: "http://localhost:5000/api",
+        url: "https://whispering-fortress-45201.herokuapp.com/api",
+        //url: "http://localhost:5000/api",
         data: { exp: s.toString() },
         contentType: "application/json;charset=UTF-8",
         success: function(result) {
