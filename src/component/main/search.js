@@ -21,13 +21,15 @@ class Search extends React.Component {
       $.ajax({
         type: "GET",
         url: "https://whispering-fortress-45201.herokuapp.com/api",
-        //url: "http://localhost:5000/api",
         data: { exp: s.toString() },
         contentType: "application/json;charset=UTF-8",
         success: function(result) {
           dispatch({ type: "add_disease", payload: result });
-          //console.log(result)
-        }
+    
+        },error: function(data){
+          alert("Unable to Predict Disease for this symptoms");
+          dispatch({ type: "error" });
+      }
       });
     }
   };

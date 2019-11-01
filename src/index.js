@@ -24,6 +24,9 @@ const reducer = (state = init_state, action) => {
         disease: action.payload
       };
 
+      case "error":
+          return { symptoms: [], disease: null };
+
     default:
       return state;
   }
