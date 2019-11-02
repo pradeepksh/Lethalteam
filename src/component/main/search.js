@@ -3732,7 +3732,7 @@ class Search extends React.Component {
         />
         <datalist id="sym">
           {symptoms.map((d, key) => {
-            return <option id={key} value={d} />;
+            return <option key={key} value={d} />;
           })}
         </datalist>
         <button className="predict" onClick={this.Predict}>
