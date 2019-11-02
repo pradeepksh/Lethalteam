@@ -36,7 +36,8 @@ class Search extends React.Component {
   pres = e => {
     if (e.key === "Enter") {
       if (this.state.symptoms !== "") {
-        this.props.dispatch({ type: "Add", payload: this.state.symptoms });
+
+        this.props.dispatch({ type: "Add", payload: this.state.symptoms.replace(/[,]+/g,"") });
         this.setState({
           symptoms: ""
         });
