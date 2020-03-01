@@ -1,189 +1,144 @@
 import React from "react";
 import mapboxgl from "mapbox-gl";
+import map1 from 'map.geojson';
 
 class Map extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
-    mapboxgl.accessToken =
-      "pk.eyJ1Ijoic2lzYXBpNzkzOSIsImEiOiJjazYwbnFjM3QwOTdkM21wa3p3MGFoODBlIn0.X0_rZjn7eQ2jIOOhqPG1AA";
+    mapboxgl.accessToken = 'pk.eyJ1IjoicHJhZG5lc2gwOCIsImEiOiJjazc4bm1rMjUwaDJxM21ueXozeWxjaTl2In0.xneS2KANPf7rTW4lx2o4-g';
   }
 
   componentDidMount() {
     const map = new mapboxgl.Map({
-      container: this.mapContainer,
-      style: "mapbox://styles/mapbox/dark-v10",
-      center: [73.128411, 18.990649],
-      zoom: 10
-    });
-
-    map.on("load", function() {
-      map.addSource("earthquakes", {
-        type: "geojson",
-        data: {
-          type: "FeatureCollection",
-          crs: {
-            type: "name",
-            properties: { name: "urn:ogc:def:crs:OGC:1.3:CRS84" }
-          },
-          features: [
-            {
-              type: "Disease",
-              properties: {
-                id: "ak16994521",
-                disease: "Abdominal Pain",
-                symptoms: ["asdas", "asdasd", "asas"],
-                time: 454555414
-              },
-              geometry: {
-                type: "Point",
-                coordinates: [73.124957, 18.99982, 0.0]
-              }
-            },
-            {
-              type: "Disease",
-              properties: {
-                id: "ak16994519",
-                disease: "Abdominal Pain",
-                symptoms: ["asdas", "asdasd", "asas"],
-                time: 454555414
-              },
-              geometry: {
-                type: "Point",
-                coordinates: [73.119228, 19.003809, 105.5]
-              }
-            },
-            {
-              type: "Disease",
-              properties: {
-                id: "ak16994517",
-                disease: "Abdominal Pain",
-                symptoms: ["asdas", "asdasd", "asas"],
-                time: 454555414
-              },
-              geometry: {
-                type: "Point",
-                coordinates: [73.089724, 19.020345, 0.0]
-              }
-            },
-            {
-              type: "Disease",
-              properties: {
-                id: "ci38021336",
-                disease: "Abdominal Pain",
-                symptoms: ["asdas", "asdasd", "asas"],
-                time: 454555414
-              },
-              geometry: {
-                type: "Point",
-                coordinates: [73.092739, 19.024037, 7.64]
-              }
-            },
-            {
-              type: "Disease",
-              properties: {
-                id: "us2000b2nn",
-                disease: "Abdominal Pain",
-                symptoms: ["asdas", "asdasd", "asas"],
-                time: 454555414
-              },
-              geometry: {
-                type: "Point",
-                coordinates: [73.100957, 19.009474, 46.41]
-              }
-            },
-            {
-              type: "Disease",
-              properties: {
-                id: "ak16994510",
-                disease: "Abdominal Pain",
-                symptoms: ["asdas", "asdasd", "asas"],
-                time: 454555414
-              },
-              geometry: {
-                type: "Point",
-                coordinates: [73.109132, 19.007506, 0.0]
-              }
-            },
-            {
-              type: "Disease",
-              properties: {
-                id: "us2000b2nb",
-                disease: "Abdominal Pain",
-                symptoms: ["asdas", "asdasd", "asas"],
-                time: 454555414
-              },
-              geometry: {
-                type: "Point",
-                coordinates: [73.113735, 19.010732, 614.26]
-              }
-            }
-          ]
-        }
+      container: 'map',
+      style: 'mapbox://styles/mapbox/dark-v10',
+      center: [77.1025, 28.7041],
+      zoom: 3
       });
-      // add heatmap layer here
-      // add circle layer here
-
-      map.addLayer(
-        {
-          id: "trees-heat",
-          type: "heatmap",
-          source: "earthquakes",
-          maxzoom: 23,
-          paint: {
-            // increase weight as diameter breast height increases
-            "heatmap-weight": {
-              property: "dbh",
-              type: "exponential",
-              stops: [
-                [1, 0],
-                [62, 1]
-              ]
-            },
-            // increase intensity as zoom level increases
-            "heatmap-intensity": {
-              stops: [
-                [11, 1],
-                [15, 3]
-              ]
-            },
-            // assign color values be applied to points depending on their density
-            "heatmap-color": [
-              "interpolate",
-              ["linear"],
-              ["heatmap-density"],
-              0,
-              "rgba(236,222,239,0)",
-              0.2,
-              "rgb(208,209,230)",
-              0.4,
-              "rgb(166,189,219)",
-              0.6,
-              "rgb(103,169,207)",
-              0.8,
-              "rgb(28,144,153)"
-            ],
-            // increase radius as zoom increases
-            "heatmap-radius": {
-              stops: [
-                [11, 15],
-                [15, 20]
-              ]
-            },
-            // decrease opacity to transition into the circle layer
-            "heatmap-opacity": {
-              default: 1,
-              stops: [
-                [14, 1],
-                [15, 0]
-              ]
-            }
-          }
-        },
-        "waterway-label"
+      
+      map.on('load', function() {
+      // Add a new source from our GeoJSON data and
+      // set the 'cluster' option to true. GL-JS will
+      // add the point_count property to your source data.
+      map.addSource('earthquakes', {
+      type: 'geojson',
+      // Point to GeoJSON data. This example visualizes all M1.0+ earthquakes
+      // from 12/22/15 to 1/21/16 as logged by USGS' Earthquake hazards program.
+      data:
+      map1,
+      cluster: true,
+      clusterMaxZoom: 14, // Max zoom to cluster points on
+      clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
+      });
+      
+      map.addLayer({
+      id: 'clusters',
+      type: 'circle',
+      source: 'earthquakes',
+      filter: ['has', 'point_count'],
+      paint: {
+      // Use step expressions (https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-step)
+      // with three steps to implement three types of circles:
+      //   * Blue, 20px circles when point count is less than 100
+      //   * Yellow, 30px circles when point count is between 100 and 750
+      //   * Pink, 40px circles when point count is greater than or equal to 750
+          'circle-color': [
+          'step',
+          ['get', 'point_count'],
+          '#51bbd6',100,
+          '#f1f075',750,
+          '#f28cb1'
+          ],
+          'circle-radius': [
+          'step',
+          ['get', 'point_count'],
+          20,100,30,750,40]
+      }
+      });
+      
+      map.addLayer({
+      id: 'cluster-count',
+      type: 'symbol',
+      source: 'earthquakes',
+      filter: ['has', 'point_count'],
+      layout: {
+      'text-field': '{point_count_abbreviated}',
+      'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+      'text-size': 12
+      }
+      });
+      
+      map.addLayer({
+      id: 'unclustered-point',
+      type: 'circle',
+      source: 'earthquakes',
+      filter: ['!', ['has', 'point_count']],
+      paint: {
+      'circle-color': '#11b4da',
+      'circle-radius': 4,
+      'circle-stroke-width': 1,
+      'circle-stroke-color': '#fff'
+      }
+      });
+      
+      // inspect a cluster on click
+      map.on('click', 'clusters', function(e) {
+      var features = map.queryRenderedFeatures(e.point, {
+      layers: ['clusters']
+      });
+      var clusterId = features[0].properties.cluster_id;
+      map.getSource('earthquakes').getClusterExpansionZoom(
+      clusterId,
+      function(err, zoom) {
+      if (err) return;
+      
+      map.easeTo({
+      center: features[0].geometry.coordinates,
+      zoom: zoom
+      });
+      }
       );
-    });
-    map.addControl(new mapboxgl.NavigationControl());
+      });
+      
+      // When a click event occurs on a feature in
+      // the unclustered-point layer, open a popup at
+      // the location of the feature, with
+      // description HTML from its properties.
+      map.on('click', 'unclustered-point', function(e) {
+      
+      var coordinates = e.features[0].geometry.coordinates.slice();
+      //var mag = e.features[0].properties.mag;
+      var tsunami;
+      
+      if (e.features[0].properties.disease === "Malaria") {
+      tsunami = 'Malaria'
+      } else if (e.features[0].properties.disease === "Allergies"){
+      tsunami = 'Allergies'
+      } else if (e.features[0].properties.disease === "Anaemia"){
+      tsunami = 'Anaemia'
+      }
+      
+      // Ensure that if the map is zoomed out such that
+      // multiple copies of the feature are visible, the
+      // popup appears over the copy being pointed to.
+      while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+      coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+      }
+      
+      new mapboxgl.Popup()
+      .setLngLat(coordinates)
+      .setHTML("Disease Predictor : <br>disease name: " + tsunami)
+      .addTo(map);
+      });
+      
+      map.on('mouseenter', 'clusters', function() {
+      map.getCanvas().style.cursor = 'pointer';
+      });
+      map.on('mouseleave', 'clusters', function() {
+      map.getCanvas().style.cursor = '';
+      });
+      });
   }
 
   render() {
