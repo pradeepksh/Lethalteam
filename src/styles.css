@@ -106,7 +106,7 @@
   font-family: sans-serif;
   margin: 5px 10px;
   height: 40px;
-  box-shadow:10px 0px 100px 0px var(--shadow--);
+  box-shadow: 10px 0px 100px 0px var(--shadow--);
   transition: all 0.3s ease-in;
 }
 .symptoms-box i {
@@ -138,10 +138,10 @@
   transform: scale(1.05);
 }
 
-.__react_component_tooltip{
+.__react_component_tooltip {
   font-size: 16px;
   font-family: sans-serif;
-  width:100%;
+  width: 100%;
 }
 
 .diseases .disease-main .disease-top {
@@ -164,4 +164,11 @@
   color: var(--blue--);
   font-size: 16px;
   font-weight: bold;
+}
+
+.map {
+  flex: 1;
+}
+.mapboxgl-map {
+  height: 600px;
 }

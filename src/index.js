@@ -4,7 +4,9 @@ import { createStore } from "redux";
 import { Provider } from "react-redux";
 import Header from "./component/header";
 import Main from "./component/main";
+import { Map as Map1 } from "./component/admin/map";
 import "./styles.css";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 
 const init_state = {
   symptoms: [],
@@ -24,8 +26,8 @@ const reducer = (state = init_state, action) => {
         disease: action.payload
       };
 
-      case "error":
-          return { symptoms: [], disease: null };
+    case "error":
+      return { symptoms: [], disease: null };
 
     default:
       return state;
@@ -33,15 +35,25 @@ const reducer = (state = init_state, action) => {
 };
 const store = createStore(reducer);
 //store.dispatch({ type: "hello" });
+class App1 extends React.Component {
+  render() {
+    return (
+      <div className="App">
+        <Header />
+        <Main />
+      </div>
+    );
+  }
+}
 class App extends React.Component {
   render() {
     return (
-      <Provider store={store}>
-        <div className="App">
-          <Header />
-          <Main />
-        </div>
-      </Provider>
+      <Router>
+        <Provider store={store}>
+          <Route path="/" component={App1} exact />
+          <Route path="/admin/map" component={Map1} exact />
+        </Provider>
+      </Router>
     );
   }
 }
