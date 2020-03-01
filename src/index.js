@@ -1,143 +1,62 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import map1 from './map.geojson';
-import mapboxgl from 'mapbox-gl/dist/mapbox-gl';
-import * as serviceWorker from './serviceWorker';
+import React from "react";
+import ReactDOM from "react-dom";
+import { createStore } from "redux";
+import { Provider } from "react-redux";
+import Header from "./component/header";
+import Main from "./component/main";
+import { Map as Map1 } from "./component/admin/map";
+import "./styles.css";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 
-ReactDOM.render(<App />, document.getElementById('map'));
-mapboxgl.accessToken = 'pk.eyJ1IjoicHJhZG5lc2gwOCIsImEiOiJjazc4bm1rMjUwaDJxM21ueXozeWxjaTl2In0.xneS2KANPf7rTW4lx2o4-g';
-    var map = new mapboxgl.Map({
-    container: 'map',
-    style: 'mapbox://styles/mapbox/dark-v10',
-    center: [77.1025, 28.7041],
-    zoom: 3
-    });
-    
-    map.on('load', function() {
-    // Add a new source from our GeoJSON data and
-    // set the 'cluster' option to true. GL-JS will
-    // add the point_count property to your source data.
-    map.addSource('earthquakes', {
-    type: 'geojson',
-    // Point to GeoJSON data. This example visualizes all M1.0+ earthquakes
-    // from 12/22/15 to 1/21/16 as logged by USGS' Earthquake hazards program.
-    data:
-    map1,
-    cluster: true,
-    clusterMaxZoom: 14, // Max zoom to cluster points on
-    clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
-    });
-    
-    map.addLayer({
-    id: 'clusters',
-    type: 'circle',
-    source: 'earthquakes',
-    filter: ['has', 'point_count'],
-    paint: {
-    // Use step expressions (https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-step)
-    // with three steps to implement three types of circles:
-    //   * Blue, 20px circles when point count is less than 100
-    //   * Yellow, 30px circles when point count is between 100 and 750
-    //   * Pink, 40px circles when point count is greater than or equal to 750
-        'circle-color': [
-        'step',
-        ['get', 'point_count'],
-        '#51bbd6',100,
-        '#f1f075',750,
-        '#f28cb1'
-        ],
-        'circle-radius': [
-        'step',
-        ['get', 'point_count'],
-        20,100,30,750,40]
-    }
-    });
-    
-    map.addLayer({
-    id: 'cluster-count',
-    type: 'symbol',
-    source: 'earthquakes',
-    filter: ['has', 'point_count'],
-    layout: {
-    'text-field': '{point_count_abbreviated}',
-    'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-    'text-size': 12
-    }
-    });
-    
-    map.addLayer({
-    id: 'unclustered-point',
-    type: 'circle',
-    source: 'earthquakes',
-    filter: ['!', ['has', 'point_count']],
-    paint: {
-    'circle-color': '#11b4da',
-    'circle-radius': 4,
-    'circle-stroke-width': 1,
-    'circle-stroke-color': '#fff'
-    }
-    });
-    
-    // inspect a cluster on click
-    map.on('click', 'clusters', function(e) {
-    var features = map.queryRenderedFeatures(e.point, {
-    layers: ['clusters']
-    });
-    var clusterId = features[0].properties.cluster_id;
-    map.getSource('earthquakes').getClusterExpansionZoom(
-    clusterId,
-    function(err, zoom) {
-    if (err) return;
-    
-    map.easeTo({
-    center: features[0].geometry.coordinates,
-    zoom: zoom
-    });
-    }
+const init_state = {
+  symptoms: [],
+  disease: null
+};
+const reducer = (state = init_state, action) => {
+  switch (action.type) {
+    case "Add":
+      return { symptoms: [...state.symptoms, action.payload], disease: null };
+    case "remove":
+      const index = state.symptoms.indexOf(action.payload);
+      state.symptoms.splice(index, 1);
+      return { symptoms: [...state.symptoms], disease: null };
+    case "add_disease":
+      return {
+        symptoms: [...state.symptoms],
+        disease: action.payload
+      };
+
+    case "error":
+      return { symptoms: [], disease: null };
+
+    default:
+      return state;
+  }
+};
+const store = createStore(reducer);
+//store.dispatch({ type: "hello" });
+class App1 extends React.Component {
+  render() {
+    return (
+      <div className="App">
+        <Header />
+        <Main />
+      </div>
     );
-    });
-    
-    // When a click event occurs on a feature in
-    // the unclustered-point layer, open a popup at
-    // the location of the feature, with
-    // description HTML from its properties.
-    map.on('click', 'unclustered-point', function(e) {
-    
-    var coordinates = e.features[0].geometry.coordinates.slice();
-    //var mag = e.features[0].properties.mag;
-    var tsunami;
-    
-    if (e.features[0].properties.disease === "Malaria") {
-    tsunami = 'Malaria'
-    } else if (e.features[0].properties.disease === "Allergies"){
-    tsunami = 'Allergies'
-    } else if (e.features[0].properties.disease === "Anaemia"){
-    tsunami = 'Anaemia'
-    }
-    
-    // Ensure that if the map is zoomed out such that
-    // multiple copies of the feature are visible, the
-    // popup appears over the copy being pointed to.
-    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-    }
-    
-    new mapboxgl.Popup()
-    .setLngLat(coordinates)
-    .setHTML("Disease Predictor : <br>disease name: " + tsunami)
-    .addTo(map);
-    });
-    
-    map.on('mouseenter', 'clusters', function() {
-    map.getCanvas().style.cursor = 'pointer';
-    });
-    map.on('mouseleave', 'clusters', function() {
-    map.getCanvas().style.cursor = '';
-    });
-    });
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+  }
+}
+class App extends React.Component {
+  render() {
+    return (
+      <Router>
+        <Provider store={store}>
+          <Route path="/" component={App1} exact />
+          <Route path="/admin/map" component={Map1} exact />
+        </Provider>
+      </Router>
+    );
+  }
+}
+
+const rootElement = document.getElementById("root");
+ReactDOM.render(<App />, rootElement);
