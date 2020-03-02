@@ -1,6 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
 import $ from "jquery";
+import jsonfile from '../admin/map.json'
 class Search extends React.Component {
   constructor(props) {
     super(props);
@@ -15,6 +16,47 @@ class Search extends React.Component {
   };
   Predict = e => {
     e.preventDefault();
+    getLocation();
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(addPosition);
+      } else { 
+        alert("Geolocation is not supported by this browser.");
+      }
+    }
+    var geojson = {
+      "type":"Feature",
+      "features":[{
+          "type":"Feature",
+          "geometry":{
+              "type":"LineString",
+              "coordinates":[]
+          },
+          "properties":{
+            "id":[],
+            "disease":[],
+            "date":[]
+          }
+      }]
+    };
+    function addPosition(position) {
+      var lat=position.coords.latitude;
+      console.log(position.coords.latitude);
+      var lng=position.coords.longitude; 
+      console.log(position.coords.longitude);
+      geojson.features[0].geometry.coordinates.push([lng,lat]);
+      geojson.features[0].properties.id.push("id");
+      geojson.features[0].properties.disease.push("disease");
+      geojson.features[0].properties.date.push("date");
+      
+      console.log(jsonfile);
+      jsonfile.features.push(geojson);
+      console.log(jsonfile);
+      
+    }
+    
+    console.log(geojson);
+    
     if (this.props.symptoms.length > 0) {
       const { dispatch } = this.props;
       const s = this.props.symptoms;
@@ -25,7 +67,7 @@ class Search extends React.Component {
         contentType: "application/json;charset=UTF-8",
         success: function(result) {
           dispatch({ type: "add_disease", payload: result });
-    
+  
         },error: function(data){
           alert("Unable to Predict Disease for this symptoms");
           dispatch({ type: "error" });
@@ -3730,6 +3772,7 @@ class Search extends React.Component {
           autoFocus
           list="sym"
         />
+        <p id="geo"></p>
         <datalist id="sym">
           {symptoms.map((d, key) => {
             return <option key={key} value={d} />;
