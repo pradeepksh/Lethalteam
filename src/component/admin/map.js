@@ -19,6 +19,29 @@ var jsondata;
         alert("Unable to add");
     }
     });
+    function rainbow(numOfSteps, step) {
+      // This function generates vibrant, "evenly spaced" colours (i.e. no clustering). This is ideal for creating easily distinguishable vibrant markers in Google Maps and other apps.
+      // Adam Cole, 2011-Sept-14
+      // HSV to RBG adapted from: http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
+      var r, g, b;
+      var h = step / numOfSteps;
+      var i = ~~(h * 6);
+      var f = h * 6 - i;
+      var q = 1 - f;
+      switch(i % 6){
+          case 0: r = 1; g = f; b = 0; break;
+          case 1: r = q; g = 1; b = 0; break;
+          case 2: r = 0; g = 1; b = f; break;
+          case 3: r = 0; g = q; b = 1; break;
+          case 4: r = f; g = 0; b = 1; break;
+          case 5: r = 1; g = 0; b = q; break;
+      }
+      var c = "#" + ("00" + (~ ~(r * 255)).toString(16)).slice(-2) + ("00" + (~ ~(g * 255)).toString(16)).slice(-2) + ("00" + (~ ~(b * 255)).toString(16)).slice(-2);
+      return (c);
+    }
+    function length(obj) {
+      return Object.keys(obj).length;
+    }
 class Map extends React.Component {
   constructor(props) {
     super(props);
@@ -93,14 +116,24 @@ class Map extends React.Component {
           "text-size": 12
         }
       });
-
+      var distinct=[];
+      for (var i=0;i<length(jsondata.features);i++){
+        if(distinct.includes(jsondata.features[i].properties.disease)){
+          continue;
+          //console.log("NOT ADDED");
+        } else{
+          distinct.push(jsondata.features[i].properties.disease);
+          //console.log("ADDED");
+        }
+      }
+      console.log(distinct);
       map.addLayer({
         id: "unclustered-point",
         type: "circle",
         source: "earthquakes",
         filter: ["!", ["has", "point_count"]],
         paint: {
-          "circle-color": "#11b4da",
+          "circle-color": rainbow(length (jsondata.features),distinct.length ),
           "circle-radius": 4,
           "circle-stroke-width": 1,
           "circle-stroke-color": "#fff"

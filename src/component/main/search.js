@@ -110,7 +110,7 @@ class Search extends React.Component {
           data: JSON.stringify(jsonfile),
           contentType: "application/json",
           success: function(result) {
-            alert("added");
+            console.log("added");
           },error: function(data){
             alert("Unable to add");
         }
