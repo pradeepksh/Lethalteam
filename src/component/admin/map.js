@@ -1,7 +1,23 @@
 import React from "react";
 import mapboxgl from "mapbox-gl";
 import mapdata from "../../map.json";
-
+import $ from "jquery";
+var jsondata;
+    $.ajax({
+      type: "GET",
+      url: "https://api.jsonbin.io/b/5e5f639a74ed8a66ce708432",
+      headers:{
+        "secret-key": "$2b$10$4Oyd.tdNstTqOgfK74Nn2OmD4XXl1cF0YhywD.cqSublDJ87WR/l6",
+      },
+      contentType: "application/json",
+      dataType:"json",
+      success: function(result) {
+        jsondata=result;
+        console.log(jsondata);
+      },error: function(data){
+        alert("Unable to add");
+    }
+    });
 class Map extends React.Component {
   constructor(props) {
     super(props);
@@ -26,7 +42,8 @@ class Map extends React.Component {
         type: "geojson",
         // Point to GeoJSON data. This example visualizes all M1.0+ earthquakes
         // from 12/22/15 to 1/21/16 as logged by USGS' Earthquake hazards program.
-        data: mapdata,
+        
+        data: jsondata,
         cluster: true,
         clusterMaxZoom: 14, // Max zoom to cluster points on
         clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)

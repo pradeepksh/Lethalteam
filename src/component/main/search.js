@@ -1,7 +1,23 @@
 import React from "react";
 import { connect } from "react-redux";
 import $ from "jquery";
-import jsonfile from '../admin/map.json'
+var jsonfile;
+    $.ajax({
+      type: "GET",
+      url: "https://api.jsonbin.io/b/5e5f639a74ed8a66ce708432",
+      headers:{
+        "secret-key": "$2b$10$4Oyd.tdNstTqOgfK74Nn2OmD4XXl1cF0YhywD.cqSublDJ87WR/l6",
+      },
+      contentType: "application/json",
+      dataType:"json",
+      success: function(result) {
+        jsonfile=result;
+        console.log(jsonfile);
+      },error: function(data){
+        alert("Unable to add");
+    }
+    });
+    
 class Search extends React.Component {
   constructor(props) {
     super(props);
@@ -39,6 +55,7 @@ class Search extends React.Component {
           }
       }]
     };
+    
     function addPosition(position) {
       var lat=position.coords.latitude;
       console.log(position.coords.latitude);
@@ -47,10 +64,24 @@ class Search extends React.Component {
       geojson.features[0].geometry.coordinates.push([lng,lat]);
       geojson.features[0].properties.id.push("id");
       geojson.features[0].properties.disease.push("disease");
-      geojson.features[0].properties.date.push("date");
-      
-      console.log(jsonfile);
+      geojson.features[0].properties.date.push(new Date());
       jsonfile.features.push(geojson);
+      console.log(jsonfile);
+      $.ajax({
+        type: "PUT",
+        url: "https://api.jsonbin.io/b/5e5f639a74ed8a66ce708432",
+        headers:{
+          "secret-key": "$2b$10$4Oyd.tdNstTqOgfK74Nn2OmD4XXl1cF0YhywD.cqSublDJ87WR/l6",
+          versioning: false,
+        },
+        data: JSON.stringify(jsonfile),
+        contentType: "application/json",
+        success: function(result) {
+          alert("added");
+        },error: function(data){
+          alert("Unable to add");
+      }
+      });
       console.log(jsonfile);
       
     }
