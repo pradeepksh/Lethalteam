@@ -2,6 +2,7 @@ import React from "react";
 import mapboxgl from "mapbox-gl";
 import mapdata from "../../map.json";
 import $ from "jquery";
+import diseases from "../main/details.json";
 var jsondata;
     $.ajax({
       type: "GET",
@@ -133,26 +134,10 @@ class Map extends React.Component {
         //var mag = e.features[0].properties.mag;
         var tsunami;
 
-        if (e.features[0].properties.disease === "Malaria") {
-          tsunami = "Malaria";
-        } else if (e.features[0].properties.disease === "Allergies") {
-          tsunami = "Allergies";
-        } else if (e.features[0].properties.disease === "Anaemia") {
-          tsunami = "Anaemia";
-        } else if (e.features[0].properties.disease === "diarrhea") {
-          tsunami = "diarrhea";
-        } else if (e.features[0].properties.disease === "Dengue") {
-          tsunami = "Dengue";
-        } else if (e.features[0].properties.disease === "Asthama") {
-          tsunami = "Asthama";
-        } else if (e.features[0].properties.disease === "Heart attack") {
-          tsunami = "Heart attack";
-        } else if (e.features[0].properties.disease === "Herpes") {
-          tsunami = "Herpes";
-        } else if (e.features[0].properties.disease === "Hepatitis-B") {
-          tsunami = "Hepatitis-B";
-        } else if (e.features[0].properties.disease === "Fluorosis") {
-          tsunami = "Fluorosis";
+        if (diseases.hasOwnProperty(e.features[0].properties.disease)) {
+          tsunami = e.features[0].properties.disease;
+        } else{
+          tsunami = "Disease Not found!";
         } 
 
         // Ensure that if the map is zoomed out such that
