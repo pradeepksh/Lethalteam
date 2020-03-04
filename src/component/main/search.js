@@ -32,14 +32,7 @@ class Search extends React.Component {
   };
   Predict = e => {
     e.preventDefault();
-    getLocation();
-    function getLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(addPosition);
-      } else { 
-        alert("Geolocation is not supported by this browser.");
-      }
-    }
+    /*
     var geojson = {
       "type":"Feature",
       "features":[{
@@ -55,42 +48,15 @@ class Search extends React.Component {
           }
       }]
     };
-    
-    function addPosition(position) {
-      var lat=position.coords.latitude;
-      console.log(position.coords.latitude);
-      var lng=position.coords.longitude; 
-      console.log(position.coords.longitude);
-      geojson.features[0].geometry.coordinates.push([lng,lat]);
-      geojson.features[0].properties.id.push("id");
-      geojson.features[0].properties.disease.push("disease");
-      geojson.features[0].properties.date.push(new Date());
-      jsonfile.features.push(geojson);
-      console.log(jsonfile);
-      $.ajax({
-        type: "PUT",
-        url: "https://api.jsonbin.io/b/5e5f639a74ed8a66ce708432",
-        headers:{
-          "secret-key": "$2b$10$4Oyd.tdNstTqOgfK74Nn2OmD4XXl1cF0YhywD.cqSublDJ87WR/l6",
-          versioning: false,
-        },
-        data: JSON.stringify(jsonfile),
-        contentType: "application/json",
-        success: function(result) {
-          alert("added");
-        },error: function(data){
-          alert("Unable to add");
-      }
-      });
-      console.log(jsonfile);
-      
-    }
-    
-    console.log(geojson);
-    
+    */
     if (this.props.symptoms.length > 0) {
       const { dispatch } = this.props;
       const s = this.props.symptoms;
+      var geojson;
+      function length(obj) {
+        return Object.keys(obj).length;
+      }
+      
       $.ajax({
         type: "GET",
         url: "https://whispering-fortress-45201.herokuapp.com/api",
@@ -98,12 +64,59 @@ class Search extends React.Component {
         contentType: "application/json;charset=UTF-8",
         success: function(result) {
           dispatch({ type: "add_disease", payload: result });
-  
+          geojson = {
+            "type":"Feature",
+            "properties":{
+              "id": length (jsonfile.features)+1,
+              "disease":result[0],
+              "date":new Date()
+            },
+            "geometry":{
+              "type":"Point",
+              "coordinates":[],
+            }
+          };
+          getLocation();
+          function getLocation() {
+            if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(addPosition);
+            } else { 
+              alert("Geolocation is not supported by this browser.");
+            }
+          }
+          function addPosition(position) {
+            var lat=position.coords.latitude;
+            var lng=position.coords.longitude; 
+            console.log(geojson);
+            geojson.geometry.coordinates.push([lng]);
+            geojson.geometry.coordinates.push([lat]);
+            jsonfile.features.push(geojson);
+            console.log(jsonfile);
+            addToMap();
+          }
         },error: function(data){
           alert("Unable to Predict Disease for this symptoms");
           dispatch({ type: "error" });
       }
       });
+      function addToMap(){
+        $.ajax({
+          type: "PUT",
+          url: "https://api.jsonbin.io/b/5e5f639a74ed8a66ce708432",
+          headers:{
+            "secret-key": "$2b$10$4Oyd.tdNstTqOgfK74Nn2OmD4XXl1cF0YhywD.cqSublDJ87WR/l6",
+            versioning: false,
+          },
+          data: JSON.stringify(jsonfile),
+          contentType: "application/json",
+          success: function(result) {
+            alert("added");
+          },error: function(data){
+            alert("Unable to add");
+        }
+        });
+        console.log(jsonfile);
+      }
     }
   };
   pres = e => {

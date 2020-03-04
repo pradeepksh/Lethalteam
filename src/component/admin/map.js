@@ -38,11 +38,11 @@ class Map extends React.Component {
       // Add a new source from our GeoJSON data and
       // set the 'cluster' option to true. GL-JS will
       // add the point_count property to your source data.
+      console.log(jsondata);
       map.addSource("earthquakes", {
         type: "geojson",
         // Point to GeoJSON data. This example visualizes all M1.0+ earthquakes
         // from 12/22/15 to 1/21/16 as logged by USGS' Earthquake hazards program.
-        
         data: jsondata,
         cluster: true,
         clusterMaxZoom: 14, // Max zoom to cluster points on
@@ -151,6 +151,8 @@ class Map extends React.Component {
           tsunami = "Herpes";
         } else if (e.features[0].properties.disease === "Hepatitis-B") {
           tsunami = "Hepatitis-B";
+        } else if (e.features[0].properties.disease === "Fluorosis") {
+          tsunami = "Fluorosis";
         } 
 
         // Ensure that if the map is zoomed out such that
