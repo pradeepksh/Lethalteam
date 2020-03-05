@@ -1,8 +1,8 @@
 import React from "react";
 import mapboxgl from "mapbox-gl";
-import mapdata from "../../map.json";
 import $ from "jquery";
 import diseases from "../main/details.json";
+import * as d3 from "d3";
 var jsondata;
     $.ajax({
       type: "GET",
@@ -19,29 +19,6 @@ var jsondata;
         alert("Unable to add");
     }
     });
-    function rainbow(numOfSteps, step) {
-      // This function generates vibrant, "evenly spaced" colours (i.e. no clustering). This is ideal for creating easily distinguishable vibrant markers in Google Maps and other apps.
-      // Adam Cole, 2011-Sept-14
-      // HSV to RBG adapted from: http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
-      var r, g, b;
-      var h = step / numOfSteps;
-      var i = ~~(h * 6);
-      var f = h * 6 - i;
-      var q = 1 - f;
-      switch(i % 6){
-          case 0: r = 1; g = f; b = 0; break;
-          case 1: r = q; g = 1; b = 0; break;
-          case 2: r = 0; g = 1; b = f; break;
-          case 3: r = 0; g = q; b = 1; break;
-          case 4: r = f; g = 0; b = 1; break;
-          case 5: r = 1; g = 0; b = q; break;
-      }
-      var c = "#" + ("00" + (~ ~(r * 255)).toString(16)).slice(-2) + ("00" + (~ ~(g * 255)).toString(16)).slice(-2) + ("00" + (~ ~(b * 255)).toString(16)).slice(-2);
-      return (c);
-    }
-    function length(obj) {
-      return Object.keys(obj).length;
-    }
 class Map extends React.Component {
   constructor(props) {
     super(props);
@@ -55,150 +32,283 @@ class Map extends React.Component {
       container: this.mapContainer,
       style: "mapbox://styles/mapbox/dark-v10",
       center: [77.1025, 28.7041],
-      zoom: 3
+      zoom: 1.8
     });
+    
+    const malaria = ['==', ['get', 'disease'], 'Malaria'];
+    const dengue = ['==', ['get', 'disease'], 'Dengue'];
+    const angioedema = ['==', ['get', 'disease'], 'Angioedema'];
+    const asthma = ['==', ['get', 'disease'], 'Asthma'];
+    const colors = ['#8dd3c7','#ffffb3','#bebada','#fb8072'];
 
-    map.on("load", function() {
-      // Add a new source from our GeoJSON data and
-      // set the 'cluster' option to true. GL-JS will
-      // add the point_count property to your source data.
-      console.log(jsondata);
-      map.addSource("earthquakes", {
-        type: "geojson",
-        // Point to GeoJSON data. This example visualizes all M1.0+ earthquakes
-        // from 12/22/15 to 1/21/16 as logged by USGS' Earthquake hazards program.
-        data: jsondata,
-        cluster: true,
-        clusterMaxZoom: 14, // Max zoom to cluster points on
-        clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
-      });
-
-      map.addLayer({
-        id: "clusters",
-        type: "circle",
-        source: "earthquakes",
-        filter: ["has", "point_count"],
-        paint: {
-          // Use step expressions (https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-step)
-          // with three steps to implement three types of circles:
-          //   * Blue, 20px circles when point count is less than 100
-          //   * Yellow, 30px circles when point count is between 100 and 750
-          //   * Pink, 40px circles when point count is greater than or equal to 750
-          "circle-color": [
-            "step",
-            ["get", "point_count"],
-            "#51bbd6",
-            100,
-            "#f1f075",
-            750,
-            "#f28cb1"
-          ],
-          "circle-radius": [
-            "step",
-            ["get", "point_count"],
-            20,
-            100,
-            30,
-            750,
-            40
-          ]
-        }
-      });
-
-      map.addLayer({
-        id: "cluster-count",
-        type: "symbol",
-        source: "earthquakes",
-        filter: ["has", "point_count"],
-        layout: {
-          "text-field": "{point_count_abbreviated}",
-          "text-font": ["DIN Offc Pro Medium", "Arial Unicode MS Bold"],
-          "text-size": 12
-        }
-      });
-      var distinct=[];
-      for (var i=0;i<length(jsondata.features);i++){
-        if(distinct.includes(jsondata.features[i].properties.disease)){
-          continue;
-          //console.log("NOT ADDED");
-        } else{
-          distinct.push(jsondata.features[i].properties.disease);
-          //console.log("ADDED");
-        }
-      }
-      console.log(distinct);
-      map.addLayer({
-        id: "unclustered-point",
-        type: "circle",
-        source: "earthquakes",
-        filter: ["!", ["has", "point_count"]],
-        paint: {
-          "circle-color": rainbow(length (jsondata.features),distinct.length ),
-          "circle-radius": 4,
-          "circle-stroke-width": 1,
-          "circle-stroke-color": "#fff"
-        }
-      });
-
-      // inspect a cluster on click
-      map.on("click", "clusters", function(e) {
-        var features = map.queryRenderedFeatures(e.point, {
-          layers: ["clusters"]
+    // using d3 to create a consistent color scale
+    const colorScale = d3.scaleOrdinal()
+      .domain(["malaria", "dengue", "angioedema", "asthma"])
+      .range(colors)
+      
+      map.on('load', () => {
+        // add a clustered GeoJSON source for powerplant
+        map.addSource('diseases', {
+          'type': 'geojson',
+          'data': jsondata,
+          'cluster': true,
+          'clusterRadius': 100,
+          'clusterProperties': { // keep separate counts for each fuel category in a cluster
+            'malaria': ['+', ['case', malaria, 1, 0]],
+            'dengue': ['+', ['case', dengue, 1, 0]],
+            'angioedema': ['+', ['case', angioedema, 1, 0]],
+            'asthma': ['+', ['case', asthma, 1, 0]]
+          }
         });
-        var clusterId = features[0].properties.cluster_id;
-        map
-          .getSource("earthquakes")
-          .getClusterExpansionZoom(clusterId, function(err, zoom) {
-            if (err) return;
-
-            map.easeTo({
-              center: features[0].geometry.coordinates,
-              zoom: zoom
-            });
+      
+        map.addLayer({
+          'id': 'disease_individual',
+          'type': 'circle',
+          'source': 'diseases',
+          'filter': ['!=', ['get', 'cluster'], true],
+          'paint': {
+            'circle-color': ['case',
+              malaria, colorScale('malaria'),
+              dengue, colorScale('dengue'),
+              angioedema, colorScale('angioedema'),
+              asthma, colorScale('asthma'), '#ffed6f'],
+            'circle-radius': 5
+          }
+        });
+      
+          map.addLayer({
+            'id': 'disease_individual_outer',
+            'type': 'circle',
+            'source': 'diseases',
+            'filter': ['!=', ['get', 'cluster'], true],
+            'paint': {
+              'circle-stroke-color': ['case',
+              malaria, colorScale('malaria'),
+              dengue, colorScale('dengue'),
+              angioedema, colorScale('angioedema'),
+              asthma, colorScale('asthma'), '#ffed6f'],
+              'circle-stroke-width': 2,
+              'circle-radius': 10,
+              'circle-color': "rgba(0, 0, 0, 0)"
+            }
           });
+      
+      
+      
+          let markers = {};
+          let markersOnScreen = {};
+          let point_counts = [];
+          let totals;
+      
+          const getPointCount = (features) => {
+            features.forEach(f => {
+              if (f.properties.cluster) {
+                point_counts.push(f.properties.point_count)
+              }
+            })
+      
+            return point_counts;
+          };
+      
+          const updateMarkers = () => {
+            document.getElementById('key').innerHTML = '';
+            let newMarkers = {};
+            const features = map.querySourceFeatures('diseases');
+            totals = getPointCount(features);
+            var id;
+            features.forEach((feature) => {
+              const coordinates = feature.geometry.coordinates;
+              const props = feature.properties;
+      
+              if (!props.cluster) {
+                return;
+              };
+      
+      
+              var id = props.cluster_id;
+      
+              let marker = markers[id];
+              if (!marker) {
+                const el = createDonutChart(props, totals);
+                marker = markers[id] = new mapboxgl.Marker({
+                  element: el
+                })
+                .setLngLat(coordinates)
+              }
+      
+              newMarkers[id] = marker;
+      
+              if (!markersOnScreen[id]) {
+                marker.addTo(map);
+              }
+            });
+      
+            for (id in markersOnScreen) {
+              if (!newMarkers[id]) {
+                markersOnScreen[id].remove();
+              }
+            }
+              markersOnScreen = newMarkers;
+          };
+      
+          const createDonutChart = (props, totals) => {
+            const div = document.createElement('div');
+            const data = [
+              {type: 'malaria', count: props.malaria},
+              {type: 'dengue', count: props.dengue},
+              {type: 'asthma', count: props.asthma},
+              {type: 'angioedema', count: props.angioedema},
+            ];
+      
+            const thickness = 10;
+            const scale = d3.scaleLinear()
+              .domain([d3.min(totals), d3.max(totals)])
+              .range([500, d3.max(totals)])
+      
+            const radius = Math.sqrt(scale(props.point_count));
+            const circleRadius = radius - thickness;
+      
+            const svg = d3.select(div)
+              .append('svg')
+              .attr('class', 'pie')
+              .attr('width', radius * 2)
+              .attr('height', radius * 2);
+      
+            //center
+            const g = svg.append('g')
+              .attr('transform', `translate(${radius}, ${radius})`);
+      
+            const arc = d3.arc()
+              .innerRadius(radius - thickness)
+              .outerRadius(radius);
+      
+            const pie = d3.pie()
+              .value(d => d.count)
+              .sort(null);
+      
+            const path = g.selectAll('path')
+              .data(pie(data.sort((x, y) => d3.ascending(y.count, x.count))))
+              .enter()
+              .append('path')
+              .attr('d', arc)
+              .attr('fill', (d) => colorScale(d.data.type))
+      
+            const circle = g.append('circle')
+              .attr('r', circleRadius)
+              .attr('fill', 'rgba(0, 0, 0, 0.7)')
+              .attr('class', 'center-circle')
+      
+            const text = g
+              .append("text")
+              .attr("class", "total")
+              .text(props.point_count_abbreviated)
+              .attr('text-anchor', 'middle')
+              .attr('dy', 5)
+              .attr('fill', 'white')
+      
+              const infoEl = createTable(props);
+      
+              svg.on('click', () => {
+                d3.selectAll('.center-circle').attr('fill', 'rgba(0, 0, 0, 0.7)')
+                circle.attr('fill', 'rgb(71, 79, 102)')
+                document.getElementById('key').innerHTML = '';
+                document.getElementById('key').append(infoEl);
+              })
+      
+            return div;
+          }
+      
+          const createTable = (props) => {
+            const getPerc = (count) => {
+              return count/props.point_count;
+            };
+      
+            const data = [
+              {type: 'malaria', perc: getPerc(props.malaria)},
+              {type: 'dengue', perc: getPerc(props.dengue)},
+              {type: 'asthma', perc: getPerc(props.asthma)},
+              {type: 'angioedema', perc: getPerc(props.angioedema)},
+            ];
+      
+            const columns = ['type', 'perc']
+            const div = document.createElement('div');
+            const table = d3.select(div).append('table').attr('class', 'table')
+            const thead = table.append('thead')
+            const	tbody = table.append('tbody');
+      
+            thead.append('tr')
+              .selectAll('th')
+              .data(columns).enter()
+              .append('th')
+              .text((d) => {
+                let colName = d === 'perc' ? '%' : 'Disease Type'
+                return colName;
+              })
+      
+            const rows = tbody.selectAll('tr')
+              .data(data.filter(i => i.perc).sort((x, y) => d3.descending(x.perc, y.perc)))
+              .enter()
+              .append('tr')
+              .style('border-left', (d) => `20px solid ${colorScale(d.type)}`);
+      
+            // create a cell in each row for each column
+            const cells = rows.selectAll('td')
+              .data((row) => {
+                return columns.map((column) => {
+                  let val = column === 'perc' ? d3.format(".2%")(row[column]) : row[column];
+                  return {column: column, value: val};
+                });
+              })
+              .enter()
+              .append('td')
+              .text((d) => d.value)
+              .style('text-transform', 'capitalize')
+      
+            return div;
+          }
+      
+          map.on('data', (e) => {
+            if (e.sourceId !== 'diseases' || !e.isSourceLoaded) return;
+      
+            map.on('move', updateMarkers);
+            map.on('moveend', updateMarkers);
+            updateMarkers();
+          });
+
+
+          map.on("click", "disease_individual", function(e) {
+            var coordinates = e.features[0].geometry.coordinates.slice();
+            //var mag = e.features[0].properties.mag;
+            var tsunami;
+    
+            if (diseases.hasOwnProperty(e.features[0].properties.disease)) {
+              tsunami = e.features[0].properties.disease;
+            } else{
+              tsunami = "Disease Not found!";
+            } 
+    
+            // Ensure that if the map is zoomed out such that
+            // multiple copies of the feature are visible, the
+            // popup appears over the copy being pointed to.
+            while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+              coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+            }
+    
+            new mapboxgl.Popup()
+              .setLngLat(coordinates)
+              .setHTML("Disease Predictor : <br>disease name: " + tsunami)
+              .addTo(map);
+          });
+
+
       });
-
-      // When a click event occurs on a feature in
-      // the unclustered-point layer, open a popup at
-      // the location of the feature, with
-      // description HTML from its properties.
-      map.on("click", "unclustered-point", function(e) {
-        var coordinates = e.features[0].geometry.coordinates.slice();
-        //var mag = e.features[0].properties.mag;
-        var tsunami;
-
-        if (diseases.hasOwnProperty(e.features[0].properties.disease)) {
-          tsunami = e.features[0].properties.disease;
-        } else{
-          tsunami = "Disease Not found!";
-        } 
-
-        // Ensure that if the map is zoomed out such that
-        // multiple copies of the feature are visible, the
-        // popup appears over the copy being pointed to.
-        while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-          coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-        }
-
-        new mapboxgl.Popup()
-          .setLngLat(coordinates)
-          .setHTML("Disease Predictor : <br>disease name: " + tsunami)
-          .addTo(map);
-      });
-
-      map.on("mouseenter", "clusters", function() {
-        map.getCanvas().style.cursor = "pointer";
-      });
-      map.on("mouseleave", "clusters", function() {
-        map.getCanvas().style.cursor = "";
-      });
-    });
   }
 
   render() {
     return (
       <div className="map">
         <div ref={el => (this.mapContainer = el)} />
+        <div id="key"></div>
       </div>
     );
   }
