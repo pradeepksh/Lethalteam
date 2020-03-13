@@ -10,7 +10,8 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 
 const init_state = {
   symptoms: [],
-  disease: null
+  disease: null,
+  loading: false
 };
 const reducer = (state = init_state, action) => {
   switch (action.type) {
@@ -19,15 +20,18 @@ const reducer = (state = init_state, action) => {
     case "remove":
       const index = state.symptoms.indexOf(action.payload);
       state.symptoms.splice(index, 1);
-      return { symptoms: [...state.symptoms], disease: null };
+      return { ...state, symptoms: [...state.symptoms], disease: null };
     case "add_disease":
       return {
+        ...state,
         symptoms: [...state.symptoms],
         disease: action.payload
       };
+    case "loading":
+      return { ...state, loading: action.payload };
 
     case "error":
-      return { symptoms: [], disease: null };
+      return { ...state, symptoms: [], disease: null };
 
     default:
       return state;

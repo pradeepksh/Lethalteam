@@ -1,7 +1,8 @@
 :root {
   --blue--: #6088bb;
   --green--: #12cc94;
-  --shadow--: #374b64;
+  /* --shadow--: #374b64;*/
+  --shadow--: #ffffff;
 }
 
 #root,
@@ -164,6 +165,26 @@
   color: var(--blue--);
   font-size: 16px;
   font-weight: bold;
+}
+
+.loading {
+  width: 50px;
+  height: 50px;
+  border-radius: 100%;
+  border-right: 5px solid var(--blue--);
+  animation-name: load;
+  animation-duration: 0.3s;
+  animation-delay: 0s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes load {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .map {

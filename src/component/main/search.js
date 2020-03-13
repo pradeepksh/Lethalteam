@@ -13,11 +13,22 @@ class Search extends React.Component {
       symptoms: e.target.value
     });
   };
+
+  add_disease = (type, payload) => {
+    this.props.dispatch({ type, payload });
+  };
+
+  loading = (type, payload) => {
+    this.props.dispatch({ type, payload });
+  };
+
   Predict = e => {
     e.preventDefault();
     if (this.props.symptoms.length > 0) {
       const { dispatch } = this.props;
+      dispatch({ type: "loading", payload: true });
       const s = this.props.symptoms;
+
       $.ajax({
         type: "GET",
         url: "https://whispering-fortress-45201.herokuapp.com/api",
@@ -25,19 +36,22 @@ class Search extends React.Component {
         contentType: "application/json;charset=UTF-8",
         success: function(result) {
           dispatch({ type: "add_disease", payload: result });
-    
-        },error: function(data){
+          dispatch({ type: "loading", payload: false });
+        },
+        error: function(data) {
           alert("Unable to Predict Disease for this symptoms");
           dispatch({ type: "error" });
-      }
+        }
       });
     }
   };
   pres = e => {
     if (e.key === "Enter") {
       if (this.state.symptoms !== "") {
-
-        this.props.dispatch({ type: "Add", payload: this.state.symptoms.replace(/[,]+/g,"") });
+        this.props.dispatch({
+          type: "Add",
+          payload: this.state.symptoms.replace(/[,]+/g, "")
+        });
         this.setState({
           symptoms: ""
         });
@@ -3744,7 +3758,11 @@ class Search extends React.Component {
 }
 
 const mapstatestoprops = state => {
-  return { symptoms: state.symptoms, disease: state.disease };
+  return {
+    loading: state.loading,
+    symptoms: state.symptoms,
+    disease: state.disease
+  };
 };
 
 export default connect(mapstatestoprops)(Search);
