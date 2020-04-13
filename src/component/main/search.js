@@ -5,12 +5,12 @@ class Search extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      symptoms: ""
+      symptoms: "",
     };
   }
-  handlechange = e => {
+  handlechange = (e) => {
     this.setState({
-      symptoms: e.target.value
+      symptoms: e.target.value,
     });
   };
 
@@ -22,7 +22,7 @@ class Search extends React.Component {
     this.props.dispatch({ type, payload });
   };
 
-  Predict = e => {
+  Predict = (e) => {
     e.preventDefault();
     if (this.props.symptoms.length > 0) {
       const { dispatch } = this.props;
@@ -34,44 +34,47 @@ class Search extends React.Component {
         url: "https://whispering-fortress-45201.herokuapp.com/api",
         data: { exp: s.toString() },
         contentType: "application/json;charset=UTF-8",
-        success: function(result) {
-          $.ajax({
-            type: "POST",
-            headers: {
-              "Access-Control-Allow-Origin": "*"
-            },
-            url: "http://localhost/ewealth/admin/treatment/storepredicted",
-            data: {
-              disease_name: result.toString(),
-              doctor_id: "self",
-              patient_id: "5678_pradeep",
-              prescribe_medicines: "null"
-            },
-            contentType: " application/x-www-form-urlencoded",
-            success: function(res) {
-              if (res.message === "success") {
-                dispatch({ type: "add_disease", payload: result });
-                dispatch({ type: "loading", payload: false });
-              }
-            }
-          });
+        success: function (result) {
+          // $.ajax({
+          //   type: "POST",
+          //   headers: {
+          //     "Access-Control-Allow-Origin": "*"
+          //   },
+          //   url: "http://localhost/ewealth/admin/treatment/storepredicted",
+          //   data: {
+          //     disease_name: result.toString(),
+          //     doctor_id: "self",
+          //     patient_id: "5678_pradeep",
+          //     prescribe_medicines: "null"
+          //   },
+          //   contentType: " application/x-www-form-urlencoded",
+          //   success: function(res) {
+          //     if (res.message === "success") {
+          //       dispatch({ type: "add_disease", payload: result });
+          //       dispatch({ type: "loading", payload: false });
+          //     }
+          //   }
+          // });
+          dispatch({ type: "add_disease", payload: result });
+          dispatch({ type: "loading", payload: false });
         },
-        error: function(data) {
+        error: function (data) {
           alert("Unable to Predict Disease for this symptoms");
           dispatch({ type: "error" });
-        }
+          dispatch({ type: "loading", payload: false });
+        },
       });
     }
   };
-  pres = e => {
+  pres = (e) => {
     if (e.key === "Enter") {
       if (this.state.symptoms !== "") {
         this.props.dispatch({
           type: "Add",
-          payload: this.state.symptoms.replace(/[,]+/g, "")
+          payload: this.state.symptoms.replace(/[,]+/g, ""),
         });
         this.setState({
-          symptoms: ""
+          symptoms: "",
         });
         document.getElementById("search").value = "";
       }
@@ -3747,7 +3750,7 @@ class Search extends React.Component {
       "muscle pain",
       "red eyes (conjunctivitis)",
       "lower back pain",
-      "pain behind the eyes"
+      "pain behind the eyes",
     ];
     return (
       <div className="search">
@@ -3775,11 +3778,11 @@ class Search extends React.Component {
   }
 }
 
-const mapstatestoprops = state => {
+const mapstatestoprops = (state) => {
   return {
     loading: state.loading,
     symptoms: state.symptoms,
-    disease: state.disease
+    disease: state.disease,
   };
 };
 
