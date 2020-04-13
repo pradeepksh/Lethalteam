@@ -2,13 +2,11 @@ import React from "react";
 import { connect } from "react-redux";
 
 class Symptoms extends React.Component {
-  constructor(props) {
-    super(props);
-  }
   remove = e => {
     this.props.dispatch({ type: "remove", payload: e.target.dataset["val"] });
   };
   render() {
+    //console.log(this.props);
     return (
       <div className="symptoms">
         {this.props.symptoms.map((d, key) => {

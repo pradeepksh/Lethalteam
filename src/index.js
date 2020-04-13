@@ -8,10 +8,12 @@ import { Map as Map1 } from "./component/admin/map";
 import { DocMap } from "./component/admin/docmap";
 import "./styles.css";
 import { BrowserRouter as Router, Route } from "react-router-dom";
+import Login from "./component/auth/login";
 
 const init_state = {
   symptoms: [],
-  disease: null
+  disease: null,
+  loading: false
 };
 const reducer = (state = init_state, action) => {
   switch (action.type) {
@@ -20,15 +22,18 @@ const reducer = (state = init_state, action) => {
     case "remove":
       const index = state.symptoms.indexOf(action.payload);
       state.symptoms.splice(index, 1);
-      return { symptoms: [...state.symptoms], disease: null };
+      return { ...state, symptoms: [...state.symptoms], disease: null };
     case "add_disease":
       return {
+        ...state,
         symptoms: [...state.symptoms],
         disease: action.payload
       };
+    case "loading":
+      return { ...state, loading: action.payload };
 
     case "error":
-      return { symptoms: [], disease: null };
+      return { ...state, symptoms: [], disease: null };
 
     default:
       return state;
@@ -54,6 +59,8 @@ class App extends React.Component {
           <Route path="/" component={App1} exact />
           <Route path="/admin/map" component={Map1} exact />
           <Route path="/admin/docmap" component={DocMap} exact />
+          <Route path="/login" component={Login} exact />
+
         </Provider>
       </Router>
     );

@@ -1,7 +1,8 @@
 :root {
   --blue--: #6088bb;
   --green--: #12cc94;
-  --shadow--: #374b64;
+  /* --shadow--: #374b64;*/
+  --shadow--: #ffffff;
 }
 
 #root,
@@ -48,8 +49,8 @@
   flex: 1;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 20px 0px;
+  justify-content: flex-start;
+  padding: 100px 0px;
 }
 
 .main .search {
@@ -125,14 +126,14 @@
 }
 
 .diseases .disease-main {
-  padding: 10px;
-  box-shadow: 0px 0px 30px 0px rgba(166, 166, 166, 1);
+  box-shadow: 0px 5px 10px 0px rgba(166, 166, 166, 1);
   border-radius: 10px;
   margin: 15px;
   transition: all 0.2s ease-in;
   cursor: auto;
-  min-width: 150px;
+  max-width: 300px;
   padding: 20px;
+  height: fit-content;
 }
 .diseases .disease-main:hover {
   transform: scale(1.05);
@@ -147,8 +148,7 @@
 .diseases .disease-main .disease-top {
   width: 100%;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
 }
 .disease-top i {
   display: flex;
@@ -164,6 +164,32 @@
   color: var(--blue--);
   font-size: 16px;
   font-weight: bold;
+}
+
+.bar .bar-peice {
+  width: 23%;
+  height: 5px;
+  border-radius: 5px;
+}
+
+.loading {
+  width: 50px;
+  height: 50px;
+  border-radius: 100%;
+  border-right: 5px solid var(--blue--);
+  animation-name: load;
+  animation-duration: 0.3s;
+  animation-delay: 0s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes load {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .map {

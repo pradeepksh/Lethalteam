@@ -22,15 +22,24 @@ class Search extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      symptoms: ""
+      symptoms: "",
     };
   }
-  handlechange = e => {
+  handlechange = (e) => {
     this.setState({
-      symptoms: e.target.value
+      symptoms: e.target.value,
     });
   };
-  Predict = e => {
+
+  add_disease = (type, payload) => {
+    this.props.dispatch({ type, payload });
+  };
+
+  loading = (type, payload) => {
+    this.props.dispatch({ type, payload });
+  };
+
+  Predict = (e) => {
     e.preventDefault();
     /*
     var geojson = {
@@ -51,19 +60,41 @@ class Search extends React.Component {
     */
     if (this.props.symptoms.length > 0) {
       const { dispatch } = this.props;
+      dispatch({ type: "loading", payload: true });
       const s = this.props.symptoms;
       var geojson;
       function length(obj) {
         return Object.keys(obj).length;
       }
       
+
       $.ajax({
         type: "GET",
-        //url: "https://whispering-fortress-45201.herokuapp.com/api",
-        url: "http://127.0.0.1:5000/api",
+        url: "http://192.168.0.103:5000/api",
         data: { exp: s.toString() },
         contentType: "application/json;charset=UTF-8",
-        success: function(result) {
+        success: function (result) {
+          // $.ajax({
+          //   type: "POST",
+          //   headers: {
+          //     "Access-Control-Allow-Origin": "*"
+          //   },
+          //   url: "http://localhost/ewealth/admin/treatment/storepredicted",
+          //   data: {
+          //     disease_name: result.toString(),
+          //     doctor_id: "self",
+          //     patient_id: "5678_pradeep",
+          //     prescribe_medicines: "null"
+          //   },
+          //   contentType: " application/x-www-form-urlencoded",
+          //   success: function(res) {
+          //     if (res.message === "success") {
+          //       dispatch({ type: "add_disease", payload: result });
+          //       dispatch({ type: "loading", payload: false });
+          //     }
+          //   }
+          // });
+          //console.log(result);
           dispatch({ type: "add_disease", payload: result });
           geojson = {
             "type":"Feature",
@@ -95,10 +126,12 @@ class Search extends React.Component {
             console.log(jsonfile);
             addToMap();
           }
-        },error: function(data){
+        },
+        error: function (data) {
           alert("Unable to Predict Disease for this symptoms");
           dispatch({ type: "error" });
-      }
+          dispatch({ type: "loading", payload: false });
+        },
       });
       function addToMap(){
         $.ajax({
@@ -120,13 +153,15 @@ class Search extends React.Component {
       }
     }
   };
-  pres = e => {
+  pres = (e) => {
     if (e.key === "Enter") {
       if (this.state.symptoms !== "") {
-
-        this.props.dispatch({ type: "Add", payload: this.state.symptoms.replace(/[,]+/g,"") });
+        this.props.dispatch({
+          type: "Add",
+          payload: this.state.symptoms.replace(/[,]+/g, ""),
+        });
         this.setState({
-          symptoms: ""
+          symptoms: "",
         });
         document.getElementById("search").value = "";
       }
@@ -3802,7 +3837,7 @@ class Search extends React.Component {
       "muscle pain",
       "red eyes (conjunctivitis)",
       "lower back pain",
-      "pain behind the eyes"
+      "pain behind the eyes",
     ];
     return (
       <div className="search">
@@ -3831,8 +3866,12 @@ class Search extends React.Component {
   }
 }
 
-const mapstatestoprops = state => {
-  return { symptoms: state.symptoms, disease: state.disease };
+const mapstatestoprops = (state) => {
+  return {
+    loading: state.loading,
+    symptoms: state.symptoms,
+    disease: state.disease,
+  };
 };
 
 export default connect(mapstatestoprops)(Search);
