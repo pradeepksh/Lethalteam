@@ -31,7 +31,7 @@ class Search extends React.Component {
 
       $.ajax({
         type: "GET",
-        url: "https://whispering-fortress-45201.herokuapp.com/api",
+        url: "http://192.168.0.103:5000/api",
         data: { exp: s.toString() },
         contentType: "application/json;charset=UTF-8",
         success: function (result) {
@@ -55,6 +55,7 @@ class Search extends React.Component {
           //     }
           //   }
           // });
+          //console.log(result);
           dispatch({ type: "add_disease", payload: result });
           dispatch({ type: "loading", payload: false });
         },
