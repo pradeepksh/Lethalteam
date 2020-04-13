@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 import Header from "./component/header";
 import Main from "./component/main";
 import { Map as Map1 } from "./component/admin/map";
+import { DocMap } from "./component/admin/docmap";
 import "./styles.css";
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import Login from "./component/auth/login";
@@ -57,7 +58,9 @@ class App extends React.Component {
         <Provider store={store}>
           <Route path="/" component={App1} exact />
           <Route path="/admin/map" component={Map1} exact />
+          <Route path="/admin/docmap" component={DocMap} exact />
           <Route path="/login" component={Login} exact />
+
         </Provider>
       </Router>
     );
