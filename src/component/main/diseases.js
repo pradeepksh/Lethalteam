@@ -2,6 +2,7 @@ import React from "react";
 import { connect } from "react-redux";
 import ReactTooltip from "react-tooltip";
 import loader from "./loading.gif";
+import Bar from "./bar";
 
 const preventions = require("./preventions.json");
 const data = require("./details.json");
@@ -9,29 +10,25 @@ const data = require("./details.json");
 class Diseases extends React.Component {
   constructor() {
     super();
-    this.state = {
-      display: "none"
-    };
+    this.state = {};
   }
   show(e) {
     e.preventDefault();
     e.target.dataset["tip"] = data[e.target.dataset["disease"]].detail;
   }
 
-  block = () => {
-    this.state.display === "none"
-      ? this.setState(prev => ({
-          ...prev,
-          display: "block"
-        }))
-      : this.setState(prev => ({
-          ...prev,
-          display: "none"
-        }));
+  block = e => {
+    document.getElementById(e.currentTarget.getAttribute("data-key")).style
+      .display === "none"
+      ? (document.getElementById(
+          e.currentTarget.getAttribute("data-key")
+        ).style.display = "block")
+      : (document.getElementById(
+          e.currentTarget.getAttribute("data-key")
+        ).style.display = "none");
   };
 
   render() {
-    //console.log(this.props);
     return (
       <div className="diseases">
         {this.props.disease !== null ? (
@@ -39,33 +36,50 @@ class Diseases extends React.Component {
             <div className="disease-main" key={key}>
               <div className="disease-top">
                 <div
-                  className="disease-name"
                   style={{
-                    /*textDecoration: "underline",*/ cursor: "pointer"
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between"
                   }}
-                  onClick={this.block}
                 >
-                  {d}
+                  <div
+                    className="disease-name"
+                    data-key={key}
+                    style={{
+                      textDecoration: "underline",
+                      cursor: "pointer"
+                    }}
+                    onClick={this.block}
+                  >
+                    {d[0]}
+                  </div>
+                  <i
+                    className="material-icons"
+                    data-disease={d[0]}
+                    onMouseOver={this.show}
+                    data-tip
+                    data-for={`global-${key}`}
+                  >
+                    info
+                  </i>
+                  <ReactTooltip
+                    type="info"
+                    type="dark"
+                    place="bottom"
+                    multiline={false}
+                    id={`global-${key}`}
+                    html={true}
+                  />
                 </div>
-                <i
-                  className="material-icons"
-                  data-disease={d}
-                  onMouseOver={this.show}
-                  data-tip
-                  data-for={`global-${key}`}
-                >
-                  info
-                </i>
-                <ReactTooltip
-                  type="info"
-                  type="dark"
-                  place="bottom"
-                  multiline={false}
-                  id={`global-${key}`}
-                  html={true}
-                />
+                <br />
+                <Bar percentage={parseFloat(d[1]) * 100} />
               </div>
-              {/* <div className="disease-bottom" style={{ display: "block" }}>
+              <div
+                id={key}
+                className="disease-bottom"
+                style={{ display: "none" }}
+              >
                 <h3
                   style={{
                     color: "#6088bb",
@@ -75,12 +89,12 @@ class Diseases extends React.Component {
                 >
                   Precautions
                 </h3>
-                <p style={{ fontFamily: "sans-serif" }}>
-                  {preventions.d !== "undefined"
-                    ? JSON.stringify(preventions.d.precautions)
-                    : null}
+                <p style={{ fontFamily: "sans-serif", textAlign: "justify" }}>
+                  {preventions[d]
+                    ? preventions[d].precautions
+                    : "Not Available"}
                 </p>
-              </div> */}
+              </div>
             </div>
           ))
         ) : this.props.loading ? (
