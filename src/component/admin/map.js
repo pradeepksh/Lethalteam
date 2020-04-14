@@ -39,6 +39,8 @@ class Map extends React.Component {
       center: [77.1025, 28.7041],
       zoom: 1.8
     });
+
+    map.addControl(new mapboxgl.NavigationControl());
     
     var c = [];
     while (c.length < 497) {
