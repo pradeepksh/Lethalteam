@@ -3853,7 +3853,7 @@ class Search extends React.Component {
           onChange={this.handlechange}
           onKeyUp={this.pres}
           autoFocus
-          //list="sym"
+          list="sym"
         />
         <p id="geo"></p>
         <datalist id="sym">
