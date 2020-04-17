@@ -1,5 +1,5 @@
 {
-  "name": "disease-heatmap",
+  "name": "Disease-Prediction-Web-App",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
