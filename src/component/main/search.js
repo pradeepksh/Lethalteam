@@ -136,7 +136,7 @@ class Search extends React.Component {
       function addToMap(){
         $.ajax({
           type: "PUT",
-          //url: "https://api.jsonbin.io/b/5e8d72f7980e481b8aa0c506",
+          url: "https://api.jsonbin.io/b/5e8d72f7980e481b8aa0c506",
           headers:{
             "secret-key": "$2b$10$4Oyd.tdNstTqOgfK74Nn2OmD4XXl1cF0YhywD.cqSublDJ87WR/l6",
             versioning: false,
