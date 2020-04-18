@@ -70,7 +70,7 @@ class Search extends React.Component {
 
       $.ajax({
         type: "GET",
-        url: "http://192.168.0.103:5000/api",
+        url: "http://localhost:5000/api",
         data: { exp: s.toString() },
         contentType: "application/json;charset=UTF-8",
         success: function (result) {
@@ -136,7 +136,7 @@ class Search extends React.Component {
       function addToMap(){
         $.ajax({
           type: "PUT",
-          url: "https://api.jsonbin.io/b/5e8d72f7980e481b8aa0c506",
+          //url: "https://api.jsonbin.io/b/5e8d72f7980e481b8aa0c506",
           headers:{
             "secret-key": "$2b$10$4Oyd.tdNstTqOgfK74Nn2OmD4XXl1cF0YhywD.cqSublDJ87WR/l6",
             versioning: false,
@@ -169,6 +169,10 @@ class Search extends React.Component {
   };
   render() {
     var symptoms = [
+      "fever",
+      "cough",
+      "tiredness",
+      "shortness of breath",
       "Sharp, stabbing cramp like pain",
       "Brief pain that may come or go",
       "Pain associated with vomiting",

@@ -82,6 +82,7 @@
   border: none;
   cursor: pointer;
   outline: none;
+  text-align: center;
 }
 
 .search .predict:active {
