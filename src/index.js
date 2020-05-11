@@ -7,9 +7,12 @@ import Main from "./component/main";
 import { Map as Map1 } from "./component/admin/map";
 import { DocMap } from "./component/admin/docmap";
 import "./styles.css";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { Router, Route, withRouter } from "react-router-dom";
 import Login from "./component/auth/login";
+import Corona from "./component/main/corona";
+import { createBrowserHistory } from "history";
 
+const history = createBrowserHistory();
 const init_state = {
   symptoms: [],
   disease: null,
@@ -54,15 +57,15 @@ class App1 extends React.Component {
 class App extends React.Component {
   render() {
     return (
-      <Router>
-        <Provider store={store}>
+      <Provider store={store}>
+        <Router history={history}>
           <Route path="/" component={App1} exact />
           <Route path="/admin/map" component={Map1} exact />
           <Route path="/admin/docmap" component={DocMap} exact />
           <Route path="/login" component={Login} exact />
-
-        </Provider>
-      </Router>
+          <Route path="/coronavirus" component={Corona} exact />
+        </Router>
+      </Provider>
     );
   }
 }
