@@ -1,16 +1,35 @@
 import React from "react";
 import { connect } from "react-redux";
 import $ from "jquery";
+var jsonfile;
+$.ajax({
+  type: "GET",
+  url: "https://api.jsonbin.io/b/5e8d72f7980e481b8aa0c506",
+  headers: {
+    "secret-key":
+      "$2b$10$4Oyd.tdNstTqOgfK74Nn2OmD4XXl1cF0YhywD.cqSublDJ87WR/l6",
+  },
+  contentType: "application/json",
+  dataType: "json",
+  success: function (result) {
+    jsonfile = result;
+    console.log(jsonfile);
+  },
+  error: function (data) {
+    alert("Unable to add");
+  },
+});
+
 class Search extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      symptoms: ""
+      symptoms: "",
     };
   }
-  handlechange = e => {
+  handlechange = (e) => {
     this.setState({
-      symptoms: e.target.value
+      symptoms: e.target.value,
     });
   };
 
@@ -22,19 +41,40 @@ class Search extends React.Component {
     this.props.dispatch({ type, payload });
   };
 
-  Predict = e => {
+  Predict = (e) => {
     e.preventDefault();
+    /*
+    var geojson = {
+      "type":"Feature",
+      "features":[{
+          "type":"Feature",
+          "geometry":{
+              "type":"LineString",
+              "coordinates":[]
+          },
+          "properties":{
+            "id":[],
+            "disease":[],
+            "date":[]
+          }
+      }]
+    };
+    */
     if (this.props.symptoms.length > 0) {
       const { dispatch } = this.props;
       dispatch({ type: "loading", payload: true });
       const s = this.props.symptoms;
+      var geojson;
+      function length(obj) {
+        return Object.keys(obj).length;
+      }
 
       $.ajax({
         type: "GET",
-        url: "http://192.168.0.103:5000/api",
+        url: "http://localhost:5000/api",
         data: { exp: s.toString() },
         contentType: "application/json;charset=UTF-8",
-        success: function(result) {
+        success: function (result) {
           // $.ajax({
           //   type: "POST",
           //   headers: {
@@ -57,24 +97,74 @@ class Search extends React.Component {
           // });
           //console.log(result);
           dispatch({ type: "add_disease", payload: result });
-          dispatch({ type: "loading", payload: false });
+          geojson = {
+            type: "Feature",
+            properties: {
+              id: length(jsonfile.features) + 1,
+              disease: result[0],
+              date: new Date(),
+            },
+            geometry: {
+              type: "Point",
+              coordinates: [],
+            },
+          };
+          getLocation();
+          function getLocation() {
+            if (navigator.geolocation) {
+              navigator.geolocation.getCurrentPosition(addPosition);
+            } else {
+              alert("Geolocation is not supported by this browser.");
+            }
+          }
+          function addPosition(position) {
+            var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
+            console.log(geojson);
+            geojson.geometry.coordinates.push([lng]);
+            geojson.geometry.coordinates.push([lat]);
+            jsonfile.features.push(geojson);
+            console.log(jsonfile);
+            addToMap();
+          }
         },
-        error: function(data) {
+        error: function (data) {
           alert("Unable to Predict Disease for this symptoms");
           dispatch({ type: "error" });
-        }
+          dispatch({ type: "loading", payload: false });
+        },
       });
+      function addToMap() {
+        $.ajax({
+          type: "PUT",
+          url: "https://api.jsonbin.io/b/5e8d72f7980e481b8aa0c506",
+          headers: {
+            "secret-key":
+              "$2b$10$4Oyd.tdNstTqOgfK74Nn2OmD4XXl1cF0YhywD.cqSublDJ87WR/l6",
+            versioning: false,
+          },
+          data: JSON.stringify(jsonfile),
+          contentType: "application/json",
+          success: function (result) {
+            console.log("added");
+          },
+          error: function (data) {
+            alert("Unable to add");
+          },
+        });
+        console.log(jsonfile);
+      }
     }
   };
-  pres = e => {
+  pres = (e) => {
     if (e.key === "Enter") {
       if (this.state.symptoms !== "") {
         this.props.dispatch({
           type: "Add",
-          payload: this.state.symptoms.replace(/[,]+/g, "")
+          payload: this.state.symptoms.replace(/[,]+/g, ""),
         });
         this.setState({
-          symptoms: ""
+          symptoms: "",
         });
         document.getElementById("search").value = "";
       }
@@ -3750,7 +3840,7 @@ class Search extends React.Component {
       "muscle pain",
       "red eyes (conjunctivitis)",
       "lower back pain",
-      "pain behind the eyes"
+      "pain behind the eyes",
     ];
     return (
       <div className="search">
@@ -3765,6 +3855,7 @@ class Search extends React.Component {
           autoFocus
           list="sym"
         />
+        <p id="geo"></p>
         <datalist id="sym">
           {symptoms.map((d, key) => {
             return <option key={key} value={d} />;
@@ -3778,11 +3869,11 @@ class Search extends React.Component {
   }
 }
 
-const mapstatestoprops = state => {
+const mapstatestoprops = (state) => {
   return {
     loading: state.loading,
     symptoms: state.symptoms,
-    disease: state.disease
+    disease: state.disease,
   };
 };
 
