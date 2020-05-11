@@ -5,6 +5,7 @@
   "keywords": [],
   "main": "src/index.js",
   "dependencies": {
+    "history": "4.10.1",
     "jquery": "3.4.1",
     "mapbox-gl": "^1.8.1",
     "react": "16.8.6",
