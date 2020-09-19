@@ -79,6 +79,7 @@
   width: 100px;
   margin-left: 20px;
   color: white;
+  text-align: center;
   border: none;
   cursor: pointer;
   outline: none;
@@ -140,6 +141,26 @@
   transform: scale(1.05);
 }
 
+.header-right .dot {
+  width: 5px;
+  height: 5px;
+  animation-name: dot;
+  animation-duration: 0.9s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes dot {
+  0% {
+    transform: scale(1, 1);
+  }
+  50% {
+    transform: scale(1.35, 1.35);
+  }
+  100% {
+    transform: scale(1, 1);
+  }
+}
+
 .__react_component_tooltip {
   font-size: 16px;
   font-family: sans-serif;
@@ -171,6 +192,10 @@
   width: 23%;
   height: 5px;
   border-radius: 5px;
+}
+
+iframe .css-b5oc70 {
+  background-color: red;
 }
 
 .loading {
@@ -210,13 +235,13 @@
 }
 
 .total {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   font-weight: 800;
   font-size: 15px;
 }
 
 .table {
-  font-family: 'Montserrat', sans-serif;
+  font-family: "Montserrat", sans-serif;
   color: white;
   border-collapse: collapse;
 }
