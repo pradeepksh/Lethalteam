@@ -2,22 +2,24 @@ import React from "react";
 import { connect } from "react-redux";
 import $ from "jquery";
 var jsonfile;
-    $.ajax({
-      type: "GET",
-      url: "https://api.jsonbin.io/b/5e8d72f7980e481b8aa0c506",
-      headers:{
-        "secret-key": "$2b$10$4Oyd.tdNstTqOgfK74Nn2OmD4XXl1cF0YhywD.cqSublDJ87WR/l6",
-      },
-      contentType: "application/json",
-      dataType:"json",
-      success: function(result) {
-        jsonfile=result;
-        console.log(jsonfile);
-      },error: function(data){
-        alert("Unable to add");
-    }
-    });
-    
+$.ajax({
+  type: "GET",
+  url: "https://api.jsonbin.io/b/5e8d72f7980e481b8aa0c506",
+  headers: {
+    "secret-key":
+      "$2b$10$4Oyd.tdNstTqOgfK74Nn2OmD4XXl1cF0YhywD.cqSublDJ87WR/l6",
+  },
+  contentType: "application/json",
+  dataType: "json",
+  success: function (result) {
+    jsonfile = result;
+    console.log(jsonfile);
+  },
+  error: function (data) {
+    alert("Unable to add");
+  },
+});
+
 class Search extends React.Component {
   constructor(props) {
     super(props);
@@ -66,11 +68,10 @@ class Search extends React.Component {
       function length(obj) {
         return Object.keys(obj).length;
       }
-      
 
       $.ajax({
         type: "GET",
-        url: "http://localhost:5000/api",
+        url: "https://669778926001.ngrok.io/api",
         data: { exp: s.toString() },
         contentType: "application/json;charset=UTF-8",
         success: function (result) {
@@ -97,28 +98,28 @@ class Search extends React.Component {
           //console.log(result);
           dispatch({ type: "add_disease", payload: result });
           geojson = {
-            "type":"Feature",
-            "properties":{
-              "id": length (jsonfile.features)+1,
-              "disease":result[0],
-              "date":new Date()
+            type: "Feature",
+            properties: {
+              id: length(jsonfile.features) + 1,
+              disease: result[0],
+              date: new Date(),
             },
-            "geometry":{
-              "type":"Point",
-              "coordinates":[],
-            }
+            geometry: {
+              type: "Point",
+              coordinates: [],
+            },
           };
           getLocation();
           function getLocation() {
             if (navigator.geolocation) {
               navigator.geolocation.getCurrentPosition(addPosition);
-            } else { 
+            } else {
               alert("Geolocation is not supported by this browser.");
             }
           }
           function addPosition(position) {
-            var lat=position.coords.latitude;
-            var lng=position.coords.longitude; 
+            var lat = position.coords.latitude;
+            var lng = position.coords.longitude;
             console.log(geojson);
             geojson.geometry.coordinates.push([lng]);
             geojson.geometry.coordinates.push([lat]);
@@ -133,21 +134,23 @@ class Search extends React.Component {
           dispatch({ type: "loading", payload: false });
         },
       });
-      function addToMap(){
+      function addToMap() {
         $.ajax({
           type: "PUT",
           url: "https://api.jsonbin.io/b/5e8d72f7980e481b8aa0c506",
-          headers:{
-            "secret-key": "$2b$10$4Oyd.tdNstTqOgfK74Nn2OmD4XXl1cF0YhywD.cqSublDJ87WR/l6",
+          headers: {
+            "secret-key":
+              "$2b$10$4Oyd.tdNstTqOgfK74Nn2OmD4XXl1cF0YhywD.cqSublDJ87WR/l6",
             versioning: false,
           },
           data: JSON.stringify(jsonfile),
           contentType: "application/json",
-          success: function(result) {
+          success: function (result) {
             console.log("added");
-          },error: function(data){
+          },
+          error: function (data) {
             alert("Unable to add");
-        }
+          },
         });
         console.log(jsonfile);
       }
