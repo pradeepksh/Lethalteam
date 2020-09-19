@@ -71,7 +71,7 @@ class Search extends React.Component {
 
       $.ajax({
         type: "GET",
-        url: "http://localhost:5000/api",
+        url: "https://669778926001.ngrok.io/api",
         data: { exp: s.toString() },
         contentType: "application/json;charset=UTF-8",
         success: function (result) {
@@ -172,6 +172,10 @@ class Search extends React.Component {
   };
   render() {
     var symptoms = [
+      "fever",
+      "cough",
+      "tiredness",
+      "shortness of breath",
       "Sharp, stabbing cramp like pain",
       "Brief pain that may come or go",
       "Pain associated with vomiting",

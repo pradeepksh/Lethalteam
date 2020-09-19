@@ -6,7 +6,7 @@ import Bar from "./bar";
 
 const preventions = require("./preventions.json");
 const data = require("./details.json");
-
+var x;
 class Diseases extends React.Component {
   constructor() {
     super();
@@ -90,8 +90,8 @@ class Diseases extends React.Component {
                   Precautions
                 </h3>
                 <p style={{ fontFamily: "sans-serif", textAlign: "justify" }}>
-                  {preventions[d]
-                    ? preventions[d].precautions
+                  {preventions[d[0]]
+                    ? preventions[d[0]].precautions
                     : "Not Available"}
                 </p>
               </div>

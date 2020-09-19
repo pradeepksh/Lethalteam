@@ -62,6 +62,9 @@
   "Corneal Abrasion": {
     "detail": "A corneal abrasion is a scratch on the clear front surface of the eye (cornea). Corneal abrasions typically cause significant discomfort, red eyes, watery eyes and sensitivity to light. In addition to being painful, a scratched cornea makes your eye more susceptible to infection."
   },
+  "Corona(covid-19)":{
+    "detail":"Coronavirus disease (COVID-19) is an infectious disease caused by a newly discovered coronavirus. Most people who fall sick with COVID-19 will experience mild to moderate symptoms and recover without special treatment."
+  },
   "Dermatochalasis": {
     "detail": "Dermatochalasis. Dermatochalasis is a medical condition, defined as an excess of skin in the upper or lower eyelid, also known as baggy eyes. It may be either an acquired or a congenital condition. It is generally treated with blepharoplasty."
   },
